@@ -1,0 +1,82 @@
+﻿@page "/materias/nueva"
+@page "/materias/editar/{Id:int}"
+@rendermode InteractiveServer
+@inject NavigationManager _navigator;
+@inject IRepositorioMaterias _repositorio;
+
+<h1>@_mensaje Materia</h1>
+<EditForm Model="_materia" FormName="frmMateria" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator/>
+
+    <div class="row mb-3">
+        <label for="txtNombre" class="col-2 col-form-label">Nombre</label>
+        <div>
+            <InputText id="txtNombre" class="form-control" @bind-Value="_materia.Nombre" />
+            <ValidationMessage For="()=>_materia.Nombre"/>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="txtMaxLugares" class="col-2 col-form-label">Máximo de lugares</label>
+        <div>
+            <InputText id="txtMaxLugares" class="form-control" @bind-Value="_materia.MaxLugares" />
+            <ValidationMessage For="()=>_materia.MaxLugares" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="txtAula" class="col-2 col-form-label">Aula</label>
+        <div>
+            <InputText id="txtAula" class="form-control" @bind-Value="_materia.Aula" />
+            <ValidationMessage For="()=>_materia.Aula" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="txtDescripcion" class="col-2 col-form-label">Descripcion</label>
+        <div>
+            <InputText id="txtDescripcion" class="form-control" @bind-Value="_materia.Descripcion" />
+            <ValidationMessage For="()=>_materia.Descripcion" />
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button class="btn btn-danger ms-3" @onclick="Cancelar" @onclick:preventDefault>Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private string _mensaje = "";
+    private Materia? _materia = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id > 0)
+        {
+            _materia = await _repositorio.Get(Id);
+            _mensaje = "Modificar";
+        }
+        else
+        {
+            _mensaje = "Nuevo";
+        }
+    }
+
+    private async void Guardar()
+    {
+        if (Id > 0)
+        {
+            await _repositorio.Update(Id, _materia!);
+        }
+        else
+        {
+            await _repositorio.Add(_materia!);
+        }
+        Cancelar();
+    }
+
+    private void Cancelar()
+    {
+        _navigator.NavigateTo("/registroMaterias");
+    }
+}

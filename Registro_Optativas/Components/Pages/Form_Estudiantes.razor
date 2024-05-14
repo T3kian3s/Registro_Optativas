@@ -1,0 +1,89 @@
+﻿@page "/estudiantes/nueva"
+@page "/estudiantes/editar/{Id:int}"
+@rendermode InteractiveServer
+@inject NavigationManager _navigator;
+@inject IRepositorioEstudiantes _repositorio;
+
+<h1>@_mensaje Estudiante</h1>
+
+<EditForm Model="_estudiante" FormName="frmEstudiante" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="row mb-3">
+        <label for="txtNombre" class="col-2 col-form-label">Nombre</label>
+        <div>
+            <InputText id="txtNombre" class="form-control" @bind-Value="_estudiante.Nombre" />
+            <ValidationMessage For="()=>_estudiante.Nombre"/>
+        </div>  
+    </div>
+    <div class="row mb-3">
+        <label for="txtNumeroDeCuenta" class="col-2 col-form-label">Número de cuenta</label>
+        <div>
+            <InputText id="txtNumeroDeCuenta" class="form-control" @bind-Value="_estudiante.NumeroDeCuenta" />
+            <ValidationMessage For="()=>_estudiante.NumeroDeCuenta" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="txtCorreo" class="col-2 col-form-label">Correo</label>
+        <div>
+            <InputText id="txtCorreo" class="form-control" @bind-Value="_estudiante.Correo" />
+            <ValidationMessage For="()=>_estudiante.Correo" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="txtMateria" class="col-2 col-form-label">Materia</label>
+        <div class="col-sm-10">
+            <InputSelect class="form-select" @bind-Value="_estudiante.MateriaId">
+                <option value="0" disabled="disabled">Selecciona una materia</option>
+                @foreach(var materia in _materia)
+                {
+                    <option value="@materia.Id">@materia.Nombre</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="()=>_estudiante.MateriaId" />
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary" >Guardar</button>
+    <button class="btn btn-danger ms-2" @onclick="Cancelar" @onclick:preventDefault>Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private string _mensaje = "";
+    private Estudiante? _estudiante = new();
+    private List<Materia> _materia = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _materia = await _repositorio.GetMateria();
+        if (Id > 0)
+        {
+            _estudiante = await _repositorio.Get(Id);
+            _mensaje = "Modificar";
+        }
+        else
+        {
+            _mensaje = "Nuevo";
+        }
+    }
+
+    private async void Guardar()
+    {
+        if (Id > 0)
+        {
+            await _repositorio.Update(Id, _estudiante!);
+        }
+        else
+        {
+            await _repositorio.Add(_estudiante!);
+        }
+        Cancelar();
+    }
+
+    private void Cancelar()
+    {
+        _navigator.NavigateTo("/registroEstudiantes");
+    }
+}
