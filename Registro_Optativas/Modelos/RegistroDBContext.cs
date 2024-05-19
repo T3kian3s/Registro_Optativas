@@ -9,5 +9,6 @@ namespace Registro_Optativas.Modelos
         }
         public DbSet<Estudiante> Estudiantes { get; set; }
         public DbSet<Materia> Materias { get; set; }
+        public DbSet<Profesor> Profesores { get; set; }
     }
 }

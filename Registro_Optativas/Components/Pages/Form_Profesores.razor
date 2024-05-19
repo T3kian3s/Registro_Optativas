@@ -1,0 +1,89 @@
+﻿@page "/profesores/nueva"
+@page "/profesores/editar/{Id:int}"
+@rendermode InteractiveServer
+@inject NavigationManager _navigator;
+@inject IRepositorioProfesores _repositorio;
+
+<h1>@_mensaje Profesor</h1>
+
+<EditForm Model="_profesor" FormName="frmProfesor" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="row mb-3">
+        <label for="txtNombre" class="col-2 col-form-label">Nombre</label>
+        <div>
+            <InputText id="txtNombre" class="form-control" @bind-Value="_profesor.Nombre" />
+            <ValidationMessage For="()=>_profesor.Nombre" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="txtCorreo" class="col-2 col-form-label">Correo</label>
+        <div>
+            <InputText id="txtCorreo" class="form-control" @bind-Value="_profesor.Correo" />
+            <ValidationMessage For="()=>_profesor.Correo" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="txtTelefono" class="col-2 col-form-label">Teléfono</label>
+        <div>
+            <InputText id="txtTelefono" class="form-control" @bind-Value="_profesor.Telefono" />
+            <ValidationMessage For="()=>_profesor.Telefono" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <label for="txtMateria" class="col-2 col-form-label">Materia</label>
+        <div class="col-sm-10">
+            <InputSelect class="form-select" @bind-Value="_profesor.MateriaId">
+                <option value="0" disabled="disabled">Selecciona una materia</option>
+                @foreach (var materia in _materia)
+                {
+                    <option value="@materia.Id">@materia.Nombre</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="()=>_profesor.MateriaId" />
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button class="btn btn-danger ms-2" @onclick="Cancelar" @onclick:preventDefault>Cancelar</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private string _mensaje = "";
+    private Profesor? _profesor = new();
+    private List<Materia> _materia = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _materia = await _repositorio.GetMateria();
+        if (Id > 0)
+        {
+            _profesor = await _repositorio.Get(Id);
+            _mensaje = "Modificar";
+        }
+        else
+        {
+            _mensaje = "Nuevo";
+        }
+    }
+
+    private async void Guardar()
+    {
+        if (Id > 0)
+        {
+            await _repositorio.Update(Id, _profesor!);
+        }
+        else
+        {
+            await _repositorio.Add(_profesor!);
+        }
+        Cancelar();
+    }
+
+    private void Cancelar()
+    {
+        _navigator.NavigateTo("/registroProfesores");
+    }
+}

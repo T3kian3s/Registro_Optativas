@@ -39,6 +39,7 @@ namespace Registro_Optativas.Repositorio
             var materiaActual = await _contexto.Materias.FindAsync(id);
             if (materiaActual != null)
             {
+                materiaActual.Id = materia.Id;
                 materiaActual.Nombre = materia.Nombre;
                 materiaActual.MaxLugares = materia.MaxLugares;
                 materiaActual.Aula = materia.Aula;

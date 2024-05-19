@@ -6,7 +6,7 @@ namespace Registro_Optativas.Repositorio
     public class RepositorioEstudiantes : IRepositorioEstudiantes
     {
         private readonly RegistroDBContext _contexto;
-
+        
         public RepositorioEstudiantes(RegistroDBContext contexto)
         {
             _contexto = contexto;
@@ -43,6 +43,7 @@ namespace Registro_Optativas.Repositorio
             var estudianteActual = await _contexto.Estudiantes.FindAsync(id);
             if (estudianteActual != null)
             {
+                estudianteActual.Id = estudiante.Id;
                 estudianteActual.Nombre = estudiante.Nombre;
                 estudianteActual.NumeroDeCuenta = estudiante.NumeroDeCuenta;
                 estudianteActual.Correo = estudiante.Correo;

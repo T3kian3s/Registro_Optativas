@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<RegistroDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IRepositorioEstudiantes, RepositorioEstudiantes>();
 builder.Services.AddScoped<IRepositorioMaterias, RepositorioMaterias>();
+builder.Services.AddScoped<IRepositorioProfesores, RepositorioProfesores>();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();

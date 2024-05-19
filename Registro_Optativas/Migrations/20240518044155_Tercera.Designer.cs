@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Registro_Optativas.Modelos;
 
@@ -10,9 +11,11 @@ using Registro_Optativas.Modelos;
 namespace Registro_Optativas.Migrations
 {
     [DbContext(typeof(RegistroDBContext))]
-    partial class RegistroDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240518044155_Tercera")]
+    partial class Tercera
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

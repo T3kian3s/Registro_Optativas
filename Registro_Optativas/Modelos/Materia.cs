@@ -17,7 +17,9 @@ namespace Registro_Optativas.Modelos
         [Required(ErrorMessage = "La 'Descripción' de la materia es requerida.")]
         [StringLength(100, ErrorMessage = "Máximo 100 caracteres.")]
         public string? Descripcion { get; set; }
+        
         // Propiedad de navegación EF.
         virtual public ICollection<Estudiante>? Estudiantes {  get; set; }
+        virtual public ICollection<Profesor>? Profesores { get; set; }
     }
 }
