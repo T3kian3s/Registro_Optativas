@@ -9,5 +9,7 @@ namespace Registro_Optativas.Repositorio
         Task<Materia> Add(Materia materia);
         Task Update(int id, Materia materia);
         Task Delete(int id);
+        Task<bool> NombreExistente(string nombre);
+        Task<bool> AulaExistente(string aula);
     }
 }

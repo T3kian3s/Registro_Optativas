@@ -5,19 +5,24 @@
 @inject IRepositorioMaterias _repositorio;
 
 <h1>@_mensaje Materia</h1>
+@if (!string.IsNullOrEmpty(_mensajeAlerta))
+{
+    <div class="alert alert-danger">@_mensajeAlerta</div>
+}
+
 <EditForm Model="_materia" FormName="frmMateria" OnValidSubmit="Guardar">
     <DataAnnotationsValidator/>
 
     <div class="row mb-3">
         <label for="txtNombre" class="col-2 col-form-label">Nombre</label>
         <div>
-            <InputText id="txtNombre" class="form-control" @bind-Value="_materia.Nombre" />
+            <InputText id="txtNombre" class="form-control" @bind-Value="_materia!.Nombre" />
             <ValidationMessage For="()=>_materia.Nombre"/>
         </div>
     </div>
 
     <div class="row mb-3">
-        <label for="txtMaxLugares" class="col-2 col-form-label">Máximo de lugares</label>
+        <label for="txtMaxLugares" class="col-2 col-form-label">Lugares</label>
         <div>
             <InputText id="txtMaxLugares" class="form-control" @bind-Value="_materia.MaxLugares" />
             <ValidationMessage For="()=>_materia.MaxLugares" />
@@ -48,12 +53,17 @@
     public int Id { get; set; }
     private string _mensaje = "";
     private Materia? _materia = new();
+    private string _mensajeAlerta = "";
+    private string? _nombreOriginal;
+    private string? _aulaOriginal;
 
     protected override async Task OnInitializedAsync()
     {
         if (Id > 0)
         {
             _materia = await _repositorio.Get(Id);
+            _nombreOriginal = _materia!.Nombre;
+            _aulaOriginal = _materia.Aula;
             _mensaje = "Modificar";
         }
         else
@@ -64,6 +74,24 @@
 
     private async void Guardar()
     {
+        if (Id == 0 || (_nombreOriginal != null && _materia!.Nombre != _nombreOriginal))
+        {
+            if (await _repositorio.NombreExistente(_materia!.Nombre!))
+            {
+                _mensajeAlerta = "El nombre de la Materia ya existe.";
+                return;
+            }
+        }
+
+        if (Id == 0 || (_aulaOriginal != null && _materia!.Aula != _aulaOriginal))
+        {
+            if (await _repositorio.AulaExistente(_materia!.Aula!))
+            {
+                _mensajeAlerta = "El nombre del Aula ya existe.";
+                return;
+            }
+        }
+        
         if (Id > 0)
         {
             await _repositorio.Update(Id, _materia!);

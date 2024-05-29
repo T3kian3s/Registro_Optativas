@@ -4,7 +4,11 @@
 @inject NavigationManager _navigator;
 @inject IRepositorioProfesores _repositorio;
 
-<h1>@_mensaje Profesor</h1>
+<h2>@_mensaje Profesor</h2>
+@if (!string.IsNullOrEmpty(_mensajeAlerta))
+{
+    <div class="alert alert-danger">@_mensajeAlerta</div>
+}
 
 <EditForm Model="_profesor" FormName="frmProfesor" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
@@ -12,7 +16,7 @@
     <div class="row mb-3">
         <label for="txtNombre" class="col-2 col-form-label">Nombre</label>
         <div>
-            <InputText id="txtNombre" class="form-control" @bind-Value="_profesor.Nombre" />
+            <InputText id="txtNombre" class="form-control" @bind-Value="_profesor!.Nombre" />
             <ValidationMessage For="()=>_profesor.Nombre" />
         </div>
     </div>
@@ -54,6 +58,9 @@
     private string _mensaje = "";
     private Profesor? _profesor = new();
     private List<Materia> _materia = new();
+    private string _mensajeAlerta = "";
+    private string? _telefonoOriginal;
+    private int? _materiaOriginal;
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,6 +68,8 @@
         if (Id > 0)
         {
             _profesor = await _repositorio.Get(Id);
+            _telefonoOriginal = _profesor!.Telefono;
+            _materiaOriginal = _profesor.MateriaId;
             _mensaje = "Modificar";
         }
         else
@@ -71,6 +80,24 @@
 
     private async void Guardar()
     {
+        if(Id == 0 || (_telefonoOriginal != null && _profesor!.Telefono != _telefonoOriginal))
+        {
+            if (await _repositorio.TelefonoExistente(_profesor!.Telefono!))
+            {
+                _mensajeAlerta = "El teléfono ya fue registrado.";
+                return;
+            }
+        }
+
+        if (Id == 0 || (_materiaOriginal != null && _profesor!.MateriaId != _materiaOriginal))
+        {
+            if (await _repositorio.MateriaExistente(_profesor!.MateriaId!))
+            {
+                _mensajeAlerta = "La materia ya fue registrada.";
+                return;
+            }
+        }
+
         if (Id > 0)
         {
             await _repositorio.Update(Id, _profesor!);

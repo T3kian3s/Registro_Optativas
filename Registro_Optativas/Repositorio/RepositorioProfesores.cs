@@ -51,5 +51,13 @@ namespace Registro_Optativas.Repositorio
                 await _contexto.SaveChangesAsync();
             }
         }
+        public async Task<bool> TelefonoExistente(string telefono)
+        {
+            return await _contexto.Profesores.AnyAsync(e=>e.Telefono == telefono);
+        }
+        public async Task<bool> MateriaExistente(int materiaId)
+        {
+            return await _contexto.Profesores.AnyAsync(e => e.MateriaId == materiaId);
+        }
     }
 }

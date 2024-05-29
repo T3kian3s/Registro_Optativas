@@ -47,5 +47,13 @@ namespace Registro_Optativas.Repositorio
                 await _contexto.SaveChangesAsync();
             }
         }
+        public async Task<bool> NombreExistente(string nombre)
+        {
+            return await _contexto.Materias.AnyAsync(e => e.Nombre == nombre);
+        }
+        public async Task<bool> AulaExistente(string aula)
+        {
+            return await _contexto.Materias.AnyAsync(e => e.Aula == aula);
+        }
     }
 }

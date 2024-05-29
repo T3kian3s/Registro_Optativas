@@ -3,9 +3,10 @@
 @attribute [StreamRendering]
 @inject NavigationManager _navigator;
 @inject IRepositorioMaterias _repositorio;
+@inject IRepositorioEstudiantes _Erepositorio;
 <h2>Registro de Materias</h2>
 
-<a class="btn btn-success" href="materias/nueva">Agregar Nueva Materia</a>
+<a class="btn btn-success" href="materias/nueva">Agregar materia</a>
 @if (_materias == null)
 {
     <div class="spinner-border" role="status">
@@ -14,7 +15,7 @@
 }
 else if(_materias.Count == 0)
 {
-    <h3>No existe materias registradas</h3>
+    <h3>No existen materias registradas</h3>
 }   
 else
 {
@@ -23,9 +24,10 @@ else
             <tr>
                 <th>Id</th>
                 <th>Nombre</th>
-                <th>Maximo de Lugares</th>
+                <th>Lugares</th>
                 <th>Aula</th>
                 <th>Descripción</th>
+                <th>Registrados</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -38,6 +40,14 @@ else
                     <td>@materia.MaxLugares</td>
                     <td>@materia.Aula</td>
                     <td>@materia.Descripcion</td>
+                    <td>
+                        <button class="btn btn-sm" title="Registrados" @onclick="()=>Registrados(materia.Id)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" />
+                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7" />
+                            </svg>
+                        </button>
+                    </td>
                     <td>
                         <button class="btn btn-sm" title="Modificar" @onclick="()=>Modificar(materia.Id)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
@@ -54,9 +64,20 @@ else
             }
         </tbody>
     </table>
+    @if(_estudiantes != null)
+    {
+        <h3>Estudiantes registrados en esta materia: </h3>
+        <ul>
+            @foreach(var estudiante in _estudiantes)
+            {
+                <li value="@estudiante.MateriaId">@estudiante.Nombre</li>
+            }
+        </ul>
+    }
 }
 @code {
     private List<Materia>? _materias;
+    private List<Estudiante>? _estudiantes;
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,5 +94,11 @@ else
     private void Modificar(int id)
     {
         _navigator.NavigateTo($"/materias/editar/{id}");
+    }
+
+    private async void Registrados(int materiaId)
+    {
+        _estudiantes = await _Erepositorio.GetRegistrados(materiaId);
+        StateHasChanged();
     }
 }

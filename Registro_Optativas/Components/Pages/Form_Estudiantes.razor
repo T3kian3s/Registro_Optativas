@@ -4,7 +4,12 @@
 @inject NavigationManager _navigator;
 @inject IRepositorioEstudiantes _repositorio;
 
-<h1>@_mensaje Estudiante</h1>
+<h2>@_mensaje Estudiante</h2>
+
+@if (!string.IsNullOrEmpty(_mensajeAlerta))
+{
+    <div class="alert alert-danger">@_mensajeAlerta</div>
+}
 
 <EditForm Model="_estudiante" FormName="frmEstudiante" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
@@ -12,7 +17,7 @@
     <div class="row mb-3">
         <label for="txtNombre" class="col-2 col-form-label">Nombre</label>
         <div>
-            <InputText id="txtNombre" class="form-control" @bind-Value="_estudiante.Nombre" />
+            <InputText id="txtNombre" class="form-control" @bind-Value="_estudiante!.Nombre" />
             <ValidationMessage For="()=>_estudiante.Nombre"/>
         </div>  
     </div>
@@ -54,6 +59,8 @@
     private string _mensaje = "";
     private Estudiante? _estudiante = new();
     private List<Materia> _materia = new();
+    private string _mensajeAlerta = "";
+    private string? _nCuentaOriginal;
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,6 +68,7 @@
         if (Id > 0)
         {
             _estudiante = await _repositorio.Get(Id);
+            _nCuentaOriginal = _estudiante!.NumeroDeCuenta;
             _mensaje = "Modificar";
         }
         else
@@ -71,15 +79,32 @@
 
     private async void Guardar()
     {
+        if (Id == 0 || (_nCuentaOriginal != null && _estudiante!.NumeroDeCuenta != _nCuentaOriginal))
+        {
+            if (await _repositorio.Existente(_estudiante!.NumeroDeCuenta!))
+            {
+                _mensajeAlerta = "El número de cuenta ya existe.";
+                return;
+            }
+        }
+
+        if (await _repositorio.CupoLimite(_estudiante!.MateriaId))
+        {
+            _mensajeAlerta = "El límite de lugares para la materia seleccionada ha sido alcanzado. Por favor seleccione otra materia.";
+            return;
+        }
+
+        {
         if (Id > 0)
         {
-            await _repositorio.Update(Id, _estudiante!);
+           await _repositorio.Update(Id, _estudiante!);
         }
         else
         {
-            await _repositorio.Add(_estudiante!);
+           await _repositorio.Add(_estudiante!);
         }
-        Cancelar();
+           Cancelar();
+        }   
     }
 
     private void Cancelar()

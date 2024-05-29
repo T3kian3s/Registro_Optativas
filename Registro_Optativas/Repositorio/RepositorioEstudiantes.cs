@@ -50,5 +50,28 @@ namespace Registro_Optativas.Repositorio
                 await _contexto.SaveChangesAsync();
             }
         }
+        public async Task<bool> Existente(string numeroDeCuenta)
+        {
+            return await _contexto.Estudiantes.AnyAsync(e=>e.NumeroDeCuenta == numeroDeCuenta);
+        }
+
+        public async Task<bool> CupoLimite(int materiaId)
+        {
+            var materia = await _contexto.Materias.FindAsync(materiaId);
+            if (materia == null) return false;
+
+            int maxLugares;
+            if(!int.TryParse(materia.MaxLugares, out maxLugares))
+            {
+                return false;
+            }
+
+            int inscritos = await _contexto.Estudiantes.CountAsync(e => e.MateriaId == materiaId);
+            return inscritos >= maxLugares;
+        }
+        public async Task<List<Estudiante>> GetRegistrados(int materiaId)
+        {
+            return await _contexto.Estudiantes.Where(e => e.MateriaId == materiaId).ToListAsync();
+        }
     }
 }

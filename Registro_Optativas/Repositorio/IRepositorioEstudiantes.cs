@@ -10,5 +10,8 @@ namespace Registro_Optativas.Repositorio
         Task<Estudiante> Add(Estudiante estudiante);
         Task Update(int id, Estudiante estudiante);
         Task Delete(int id);
+        Task<bool> Existente(string numeroDeCuenta);
+        Task<bool> CupoLimite(int materiaId);
+        Task<List<Estudiante>> GetRegistrados(int materiaId);
     }
 }
